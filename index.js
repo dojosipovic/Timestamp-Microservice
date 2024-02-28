@@ -30,12 +30,20 @@ app.get("/api", function (req, res) {
 });
 
 app.get("/api/:date", function (req, res) {
-  let date = req.params.date ?? Date.now();
-  const dateInt = parseInt(date);
-  if (dateInt != null)
-    res.json({unix: dateInt, utc: new Date(dateInt).toUTCString()});
-  else
+  var miliseconds = Date.parse(req.params.date);
+  if (!isNaN(miliseconds)) {
+    let date = new Date(miliseconds);
+    res.json({unix: date.getTime(), utc: date.toUTCString()});
+  } else if (parseInt(req.params.date) != null) {
+    let mili = parseInt(req.params.date);
+    let date = new Date(mili);
+    if (!isNaN(date.getTime()))
+      res.json({unix: date.getTime(), utc: date.toUTCString()});
+    else res.json({ error : "Invalid Date" });
+  } else {
     res.json({ error : "Invalid Date" });
+  }
+  
 });
 
 
